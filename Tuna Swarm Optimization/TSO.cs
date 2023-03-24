@@ -69,45 +69,13 @@ namespace Tuna_Swarm_Optimization
 
             for (int i=0; i<numb_of_population; i++)
             {
-                equation_1(i);
+                equation_1(arguments, i);
+                results[i] = f(arguments[i]);
+                number_of_calls++;
             }
             current_iteration++;
-            Sort_population();
+
             SaveToFileStateOfAlghoritm();
-        }
-        void Sort_population()
-        {
-            for(int i=1; i<numb_of_population; i++)
-            {
-                for (int j=0; j<numb_of_population-i; j++)
-                {
-                    if (results[j] > results[j+1])
-                    {
-                        double result_placeholder;
-                        double[] arguments_placeholder = new double[dimension];
-                        result_placeholder = results[j];
-                        for (int k=0; k<dimension; k++)
-                        {
-                            arguments_placeholder[k] = arguments[j][k];
-                        }
-
-                        results[j] = results[j+1];
-                        results[j+1] = result_placeholder;
-
-                        for(int k=0; k<dimension; k++)
-                        {
-                            arguments[j][k] = arguments[j + 1][k];
-                            arguments[j + 1][k] = arguments_placeholder[k];
-                        }
-                    }
-                }
-            }
-
-            best_result = results[0];
-            for(int i=0; i<dimension; i++)
-            {
-                best_arguments[i] = arguments[0][i];
-            }
         }
         void calculate_parameters(double &alpha_1, double &alpha_2,double &beta, double &l, double &p)
         {
@@ -122,25 +90,36 @@ namespace Tuna_Swarm_Optimization
             p = Math.Pow((1 - arg_for_p), arg_for_p);
 
         }
-        void update_best(double[] args, double res)
+        void update_best()
         {
-            if (res < best_result)
-            {
-                best_result = res;
-                for(int i=0; i<dimension; i++)
-                {best_arguments[i] = args[i];}
-            }
-        }
 
-        void equation_1(int i)
+            best_result = results[0];
+            for (int j = 0; j < dimension; j++)
+            {
+                best_arguments[j] = arguments[0][j];
+            }
+            for (int i=0; i<numb_of_population; i++)
+            {
+                if (results[i]<best_result)
+                {
+                    best_result = results[i];
+                    for(int j=0; j<dimension; j++)
+                    {
+                        best_arguments[j] = arguments[i][j];
+                    }
+                }
+            }
+
+        }
+        void equation_1(double[][]args, int i) //to równanie jako jedyne przyjmuje też tablice argumentów, bo będę go używać zarówno do wypełniania arguments[][] jak i temp_arguments[][]
         {
             Random random = new Random();
             for(int j=0; j<dimension; j++)
             {
-                arguments[i][j] = random.NextDouble() * (upper_limit[j] - lower_limit[j]) + lower_limit[j];
+                args[i][j] = random.NextDouble() * (upper_limit[j] - lower_limit[j]) + lower_limit[j];
             }
-            results[i] = f(arguments[i]);
-            number_of_calls++;
+            //results[i] = f(args[i]);
+            //number_of_calls++;
         }
         void equation_2_transformation(double alpha_1, double alpha_2, double beta, int i)
         {
@@ -159,11 +138,11 @@ namespace Tuna_Swarm_Optimization
             
             for(int j=0; j<dimension; j++)
             {
-                arguments[i][j] = new_args[j];
+                temp_arguments[i][j] = new_args[j];
             }
-            results[i] = f(arguments[i]);
-            number_of_calls++;
-            update_best(arguments[i], results[i]);
+            //results[i] = f(arguments[i]);
+            //number_of_calls++;
+            //update_best(arguments[i], results[i]);
         }
         void equation_7_transformation(double alpha_1, double alpha_2, double beta, int i)
         {
@@ -189,11 +168,11 @@ namespace Tuna_Swarm_Optimization
 
             for (int j = 0; j < dimension; j++)
             {
-                arguments[i][j] = new_args[j];
+                temp_arguments[i][j] = new_args[j];
             }
-            results[i] = f(arguments[i]);
-            number_of_calls++;
-            update_best(arguments[i], results[i]);
+            //results[i] = f(arguments[i]);
+            //number_of_calls++;
+            //update_best(arguments[i], results[i]);
         }
         void equation_9_transformation(double rand, double p, int i)
         {
@@ -222,16 +201,18 @@ namespace Tuna_Swarm_Optimization
                     new_args[i][j] = TF * p * p * arguments[i][j];
                 }
 
-
-            }
             for (int j = 0; j < dimension; j++)
             {
-                arguments[i][j] = new_args[j];
+                temp_arguments[i][j] = new_args[j];
             }
-            results[i] = f(arguments[i]);
-            number_of_calls++;
-            update_best(arguments[i], results[i]);
+            //results[i] = f(arguments[i]);
+            //number_of_calls++;
+            //update_best(arguments[i], results[i]);
         }
+
+            }
+
+ 
 
 
 
@@ -268,6 +249,7 @@ namespace Tuna_Swarm_Optimization
             Random random = new Random();
             LoadFromFileStateOfAlghoritm();
             if (current_iteration== 0) { creating_initial_population();}
+            update_best();
 
             for(current_iteration; current_iteration<number_of_iterations; current_iteration++)
             {
@@ -279,7 +261,7 @@ namespace Tuna_Swarm_Optimization
 
                     if (rand > const_z)
                     {
-                        equation_1(i);
+                        equation_1(temp_arguments, i);
                     }
 
                     else if(rand >= 0.5)
@@ -297,6 +279,17 @@ namespace Tuna_Swarm_Optimization
                         equation_2_transformation(alpha_1, alpha_2, beta, i);
                     }
                 }
+                for (int i = 0; i < numb_of_population;; i++)
+               { 
+                for (int j = 0; j<dimension; j++)
+                {
+                    arguments[i][j] = temp_arguments[i][j];
+                }
+                results[i] = f(arguments[i]);
+                number_of_calls++;
+               }
+
+                update_best();
                 SaveToFileStateOfAlghoritm();
                 current_iteration++;
             }
