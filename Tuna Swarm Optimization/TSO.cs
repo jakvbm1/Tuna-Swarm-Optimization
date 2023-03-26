@@ -39,7 +39,7 @@ namespace Tuna_Swarm_Optimization
         public delegate double tested_function(params double[] arg);
         private tested_function f;
 
-        public TSO(int number_of_iterations, int numb_of_population, int dimension, tested_function f, double const_z, double const_a,)
+        public TSO(int number_of_iterations, int numb_of_population, int dimension, tested_function f, double const_z, double const_a)
         {
             this.number_of_iterations = number_of_iterations;
             this.numb_of_population = numb_of_population;
@@ -77,11 +77,11 @@ namespace Tuna_Swarm_Optimization
 
             SaveToFileStateOfAlghoritm();
         }
-        void calculate_parameters(double &alpha_1, double &alpha_2,double &beta, double &l, double &p)
+        void calculate_parameters(ref double alpha_1, ref double alpha_2,ref double beta, ref double l, ref double p)
         {
             Random random= new Random();
             double b = random.NextDouble();
-            alpha_1 = const_a + (1 - cons_a) * ((double)current_iteration / number_of_iterations);
+            alpha_1 = const_a + (1 - const_a) * ((double)current_iteration / number_of_iterations);
             alpha_2 = (1-const_a) - (1-const_a)*((double)current_iteration / number_of_iterations);
             l = Math.Exp(3 * Math.Cos((number_of_iterations + (1 / current_iteration)) + 1) * Math.PI);
             beta = Math.Exp(b * l) * Math.Cos(2 * Math.PI * b);
@@ -147,10 +147,10 @@ namespace Tuna_Swarm_Optimization
         void equation_7_transformation(double alpha_1, double alpha_2, double beta, int i)
         {
             double[] random_point = new double[dimension];
-            for(int i=0; i<dimension; i++)
+            for(int j=0; j<dimension; j++)
             {
                 Random random = new Random();
-                random_point[i] = random.NextDouble() * (upper_limit[j] - lower_limit[j]) + lower_limit[j];
+                random_point[j] = random.NextDouble() * (upper_limit[j] - lower_limit[j]) + lower_limit[j];
             }
 
             double[] new_args = new double[dimension];
@@ -181,27 +181,27 @@ namespace Tuna_Swarm_Optimization
             //if (neg_or_pos == 2) { neg_or_pos = -1;}
 
             //double TF = neg_or_pos * random.NextDouble();
-
-            for(int j=0; j < dimension; j++)
+            double[] new_args = new double[dimension];
+            for (int j = 0; j < dimension; j++)
             {
                 //nie jestem pewny czy TF ma być generowane dla każdego wymiaru czy jedno dla wszystkich więc na razie ustawilem osobno dla kazdego wymiaru
                 int neg_or_pos = random.Next(1, 2);
                 if (neg_or_pos == 2) { neg_or_pos = -1; }
 
                 double TF = neg_or_pos * random.NextDouble();
-                double[] new_args = new double[dimension];
 
                 if (rand < 0.5)
                 {
-                    new_args[i][j] = best_arguments[j] + rand* (best_arguments[j] - arguments[i][j]) + TF*p*p*(best_arguments[j] - arguments[i][j]);
+                    new_args[j] = best_arguments[j] + rand * (best_arguments[j] - arguments[i][j]) + TF * p * p * (best_arguments[j] - arguments[i][j]);
                 }
 
                 else
                 {
-                    new_args[i][j] = TF * p * p * arguments[i][j];
+                    new_args[j] = TF * p * p * arguments[i][j];
                 }
+            }
 
-            for (int j = 0; j < dimension; j++)
+                for (int j = 0; j < dimension; j++)
             {
                 temp_arguments[i][j] = new_args[j];
             }
@@ -210,7 +210,7 @@ namespace Tuna_Swarm_Optimization
             //update_best(arguments[i], results[i]);
         }
 
-            }
+            
 
  
 
@@ -246,17 +246,20 @@ namespace Tuna_Swarm_Optimization
         }
         public double Solve()
         {
+            current_iteration = 0;
             Random random = new Random();
             LoadFromFileStateOfAlghoritm();
-            if (current_iteration== 0) { creating_initial_population();}
+            if (current_iteration == 0) { creating_initial_population();}
             update_best();
+            
 
-            for(current_iteration; current_iteration<number_of_iterations; current_iteration++)
+
+            for(int w = current_iteration; w < number_of_iterations; w++)
             {
                 for(int i=0; i<numb_of_population; i++)
                 {
-                    double alpha_1, alpha_2, beta, l, p;
-                    calculate_parameters(alpha_1, alpha_2, beta, l, p);
+                    double alpha_1=0, alpha_2 = 0, beta = 0, l = 0, p = 0;
+                    calculate_parameters(ref alpha_1, ref alpha_2, ref beta, ref l, ref p);
                     double rand = random.NextDouble();
 
                     if (rand > const_z)
@@ -279,7 +282,7 @@ namespace Tuna_Swarm_Optimization
                         equation_2_transformation(alpha_1, alpha_2, beta, i);
                     }
                 }
-                for (int i = 0; i < numb_of_population;; i++)
+                for (int i = 0; i < numb_of_population; i++)
                { 
                 for (int j = 0; j<dimension; j++)
                 {
@@ -294,7 +297,7 @@ namespace Tuna_Swarm_Optimization
                 current_iteration++;
             }
 
-
+            return best_result;
         }
     }
 }
