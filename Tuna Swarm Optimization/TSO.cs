@@ -210,24 +210,45 @@ namespace Tuna_Swarm_Optimization
             //update_best(arguments[i], results[i]);
         }
 
-            
-
- 
-
-
-
-        public int NumberOfEvaluationFitnessFunction => throw new NotImplementedException();
-
-        double[] IOptimizationAlgorithm.XBest => throw new NotImplementedException();
-
-        double IOptimizationAlgorithm.FBest => throw new NotImplementedException();
-
+        public int NumberOfEvaluationFitnessFunction => number_of_calls;
+        double[] IOptimizationAlgorithm.XBest => best_arguments;
+        double IOptimizationAlgorithm.FBest => best_result;
         public void LoadFromFileStateOfAlghoritm()
         {
-            throw new NotImplementedException();
+            StreamReader sr = new StreamReader(file_name);
+            string line = "";
+
+            if (File.Exists(file_name))
+            {
+                line = sr.ReadLine();
+                current_iteration = int.Parse(line);
+                line = sr.ReadLine();
+                number_of_calls = int.Parse(line);
+
+                for (int i = 0; i < numb_of_population; i++)
+                {
+                    line = sr.ReadLine();
+                    string[] numbers = line.Split(" ");
+                    results[i] = int.Parse(numbers[0]);
+
+                    for(int j=0; j< dimension; j++)
+                    {
+                        arguments[i][j] = int.Parse(numbers[j+1]);
+                    }
+                }
+            }
+            sr.Close();
         }
         public void SaveResult()
         {
+            StreamWriter sw = new StreamWriter(file_name + "_END_RESULT");
+            sw.WriteLine("Ilosc wywolan funkcji: " + number_of_calls + '\n');
+            sw.WriteLine("Rozmiar populacji: " + numb_of_population + '\n');
+            sw.WriteLine("Ilosc iteracji: " + number_of_iterations + '\n');
+            sw.WriteLine("Ilosc wymiarow funkcji: " + dimension + '\n');
+
+
+
         }
         public void SaveToFileStateOfAlghoritm()
         {
@@ -243,6 +264,7 @@ namespace Tuna_Swarm_Optimization
                 }
                 sw.Write(results[i] + '\n');
             }
+            sw.Close();
         }
         public double Solve()
         {
