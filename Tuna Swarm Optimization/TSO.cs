@@ -39,7 +39,7 @@ namespace Tuna_Swarm_Optimization
         public delegate double tested_function(params double[] arg);
         private tested_function f;
 
-        public TSO(int number_of_iterations, int numb_of_population, int dimension, tested_function f, double const_z, double const_a)
+        public TSO(int number_of_iterations, int numb_of_population, int dimension, tested_function f, double const_z=0.05, double const_a=0.7)
         {
             this.number_of_iterations = number_of_iterations;
             this.numb_of_population = numb_of_population;
@@ -228,7 +228,7 @@ namespace Tuna_Swarm_Optimization
                 for (int i = 0; i < numb_of_population; i++)
                 {
                     line = sr.ReadLine();
-                    string[] numbers = line.Split(" ");
+                    string[] numbers = line.Split(", ");
                     results[i] = int.Parse(numbers[0]);
 
                     for(int j=0; j< dimension; j++)
@@ -242,10 +242,19 @@ namespace Tuna_Swarm_Optimization
         public void SaveResult()
         {
             StreamWriter sw = new StreamWriter(file_name + "_END_RESULT");
-            sw.WriteLine("Ilosc wywolan funkcji: " + number_of_calls + '\n');
-            sw.WriteLine("Rozmiar populacji: " + numb_of_population + '\n');
-            sw.WriteLine("Ilosc iteracji: " + number_of_iterations + '\n');
-            sw.WriteLine("Ilosc wymiarow funkcji: " + dimension + '\n');
+            sw.WriteLine("Ilosc wywolan funkcji: " + number_of_calls);
+            sw.WriteLine("Rozmiar populacji: " + numb_of_population);
+            sw.WriteLine("Ilosc iteracji: " + number_of_iterations);
+            sw.WriteLine("parametr a: " + const_a);
+            sw.WriteLine("parametr z: " + const_z);
+            sw.WriteLine("Ilosc wymiarow funkcji: " + dimension + '\n' );
+
+            sw.Write("Najlepszy wynik: " + best_result + " jego argumenty: ");
+            for(int i=0; i<dimension; i++)
+            {
+                sw.Write(best_arguments[i]+", ");
+                sw.Write('\n');
+            }
 
 
 
@@ -258,11 +267,12 @@ namespace Tuna_Swarm_Optimization
 
             for (int i = 0; i < numb_of_population; i++)
             {
+                sw.Write(results[i] + ", ");
                 for (int j = 0; j < dimension; j++)
                 {
-                    sw.Write(arguments[i][j]);
+                    sw.Write(arguments[i][j]+", ");
                 }
-                sw.Write(results[i] + '\n');
+                sw.Write('\n');
             }
             sw.Close();
         }
@@ -316,9 +326,8 @@ namespace Tuna_Swarm_Optimization
 
                 update_best();
                 SaveToFileStateOfAlghoritm();
-                current_iteration++;
             }
-
+            SaveResult();
             return best_result;
         }
     }
