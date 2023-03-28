@@ -56,6 +56,50 @@ namespace Tuna_Swarm_Optimization
             }
         }
 
+        public static double Bukin_function_N6(params double[] x) //minimum (-10, 1) 0 df [-15; -5] x [-3; 3] tylko dwa wymiary!
+        {
+            int dimension = x.Length;
+            double sum = 0;
+            if (dimension == 2)
+            {
+                sum = 100 * Math.Sqrt(Math.Abs(x[1] - (0.01 * x[0] * x[0]))) + 0.01 * Math.Abs(x[0] + 10);
+                return sum;
+            }
+            else
+            {
+                return 10000000;
+            }
+        }
+
+        public static double Himmelblaus_function_N6(params double[] x) //df [-5;5], minima: (3, 2), (-2.805118, 3.131312), (-3.779310, -3.283186), (3.584428, -1.848126) 0, tylko dwa wymiary!
+        {
+            int dimension = x.Length;
+            double sum = 0;
+            if (dimension == 2)
+            {
+                sum = Math.Pow((x[0] * x[0] + x[1] - 11), 2) + Math.Pow((x[1] * x[1] + x[0] - 7), 2);
+                return sum;
+            }
+            else
+            {
+                return 10000000;
+            }
+        }
+
+        public static double Eggholder_function_N6(params double[] x) //df [-512; 512], minimum: (512, 404.2319) -959.6407 tylko dwa wymiary!
+        {
+            int dimension = x.Length;
+            double sum = 0;
+            if (dimension == 2)
+            {
+                sum = -(x[1] + 47) * Math.Sin(Math.Sqrt(Math.Abs(x[0] / 2 + x[1] + 47))) - x[0] * Math.Sin(Math.Abs(x[0] - (x[1] + 47)));
+                return sum;
+            }
+            else
+            {
+                return 10000000;
+            }
+        }
 
 
     }
