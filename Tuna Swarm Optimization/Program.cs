@@ -101,6 +101,16 @@ namespace Tuna_Swarm_Optimization
             }
         }
 
+        private static void Main(string[] args)
+        {
+            int[] dimensions = { 2, 5, 10, 30, 50 };
+            int[] iterations = { 5, 10, 20, 50 };
+            int[] population = { 10, 15, 20, 50, 100 };
+
+            TSO proba_1 = new(iterations[0], population[2], dimensions[0], Rastrigin_function);
+
+            proba_1.Solve();
+        }
 
     }
 

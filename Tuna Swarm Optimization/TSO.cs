@@ -64,6 +64,52 @@ namespace Tuna_Swarm_Optimization
                 temp_arguments[i] = new double[dimension];
             }
         }
+
+        void limit_setter()
+        {
+            string user_input;
+            double limit_d, limit_u;
+            Console.WriteLine("Czy granice dla wszystkich wymiarow sa identyczne? [t/n]");
+            char ans;
+            ans = Convert.ToChar(Console.ReadLine());
+
+            if (ans == 't' || ans == 'T')
+            {
+                
+                Console.WriteLine("podaj ograniczenie dolne");
+                user_input = Console.ReadLine();
+                limit_d = Double.Parse(user_input);
+
+
+                Console.WriteLine("podaj ograniczenie gorne");
+                user_input = Console.ReadLine();
+                limit_u = Double.Parse(user_input);
+
+                for (int i = 0; i < dimension; i++)
+                {
+                    upper_limit[i] = limit_u;
+                    lower_limit[i] = limit_d;
+                }
+            }
+
+            else
+            {
+                for (int i = 0; i < dimension; i++)
+                {
+                    Console.WriteLine("Wymiar: " + (i + 1));
+                    Console.WriteLine("podaj ograniczenie dolne");
+                    user_input = Console.ReadLine();
+                    limit_d = Double.Parse(user_input);
+
+                    Console.WriteLine("podaj ograniczenie gorne");
+                    user_input = Console.ReadLine();
+                    limit_u = Double.Parse(user_input);
+                    upper_limit[i] = limit_u;
+                    lower_limit[i] = limit_d;
+                }
+            }
+        }
+
         void creating_initial_population()
         {
 
@@ -210,6 +256,21 @@ namespace Tuna_Swarm_Optimization
             //update_best(arguments[i], results[i]);
         }
 
+        void displaying_in_console(int iteration) //funkcja do testowania by "podgladac" wyniki dzialania programu w konsoli
+        {
+            Console.WriteLine("Number of iteration: " + iteration+1);
+            Console.WriteLine("Results:");
+            for (int i=0; i<numb_of_population; i++)
+            {
+                Console.Write(results[i] + ", ");
+                for (int j=0; j<dimension; j++)
+                {
+                    Console.Write(arguments[i][j] + " ");
+                }
+                Console.Write('\n');
+            }
+        }
+
         public int NumberOfEvaluationFitnessFunction => number_of_calls;
         double[] IOptimizationAlgorithm.XBest => best_arguments;
         double IOptimizationAlgorithm.FBest => best_result;
@@ -278,9 +339,10 @@ namespace Tuna_Swarm_Optimization
         }
         public double Solve()
         {
-            current_iteration = 0;
+            limit_setter();
+            //current_iteration = 0;
             Random random = new Random();
-            LoadFromFileStateOfAlghoritm();
+            //LoadFromFileStateOfAlghoritm();
             if (current_iteration == 0) { creating_initial_population();}
             update_best();
             
@@ -288,6 +350,7 @@ namespace Tuna_Swarm_Optimization
 
             for(int w = current_iteration; w < number_of_iterations; w++)
             {
+                displaying_in_console(w);
                 for(int i=0; i<numb_of_population; i++)
                 {
                     double alpha_1=0, alpha_2 = 0, beta = 0, l = 0, p = 0;
@@ -314,6 +377,9 @@ namespace Tuna_Swarm_Optimization
                         equation_2_transformation(alpha_1, alpha_2, beta, i);
                     }
                 }
+
+
+
                 for (int i = 0; i < numb_of_population; i++)
                { 
                 for (int j = 0; j<dimension; j++)
@@ -327,6 +393,7 @@ namespace Tuna_Swarm_Optimization
                 update_best();
                 SaveToFileStateOfAlghoritm();
             }
+            displaying_in_console(number_of_iterations);
             SaveResult();
             return best_result;
         }
