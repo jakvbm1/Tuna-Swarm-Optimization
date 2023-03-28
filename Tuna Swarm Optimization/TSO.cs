@@ -29,7 +29,7 @@ namespace Tuna_Swarm_Optimization
 
         //najlepsze rozwiazanie
         public double[] best_arguments;
-        public double best_result;
+        public double best_result = 100000;
 
         //zmienne pomocnicze
         public int number_of_calls = 0;
@@ -123,23 +123,28 @@ namespace Tuna_Swarm_Optimization
 
             SaveToFileStateOfAlghoritm();
         }
-        void calculate_parameters(ref double alpha_1, ref double alpha_2,ref double beta, ref double l, ref double p)
+        void calculate_parameters(ref double alpha_1, ref double alpha_2,ref double beta, ref double l, ref double p, int iteration)
         {
             Random random= new Random();
             double b = random.NextDouble();
-            alpha_1 = const_a + (1 - const_a) * ((double)current_iteration / number_of_iterations);
-            alpha_2 = (1-const_a) - (1-const_a)*((double)current_iteration / number_of_iterations);
-            l = Math.Exp(3 * Math.Cos((number_of_iterations + (1 / current_iteration)) + 1) * Math.PI);
-            beta = Math.Exp(b * l) * Math.Cos(2 * Math.PI * b);
+            alpha_1 = const_a + ((1 - const_a) * ((double)iteration / number_of_iterations));
+            alpha_2 = (1-const_a) - ((1-const_a)*((double)iteration / number_of_iterations));
 
-            double arg_for_p = current_iteration/ number_of_iterations;
+            double inside_l = Math.Cos(((number_of_iterations + (double)1 / iteration) - 1) * Math.PI);
+            l = Math.Exp(3 * inside_l);
+            double inside_beta = Math.Cos(2 * Math.PI * b);
+            beta = inside_beta* Math.Exp(b * l);
+
+            double arg_for_p = (double)iteration / number_of_iterations;
             p = Math.Pow((1 - arg_for_p), arg_for_p);
+
+           // Console.WriteLine("a1 = " + alpha_1 + " a2 = " + alpha_2 + " beta = " + beta + " l = " + l + " p = " + p);
 
         }
         void update_best()
         {
 
-            best_result = results[0];
+           // best_result = results[0];
             for (int j = 0; j < dimension; j++)
             {
                 best_arguments[j] = arguments[0][j];
@@ -258,7 +263,7 @@ namespace Tuna_Swarm_Optimization
 
         void displaying_in_console(int iteration) //funkcja do testowania by "podgladac" wyniki dzialania programu w konsoli
         {
-            Console.WriteLine("Number of iteration: " + iteration+1);
+            Console.WriteLine("Number of iteration: " + iteration);
             Console.WriteLine("Results:");
             for (int i=0; i<numb_of_population; i++)
             {
@@ -354,10 +359,10 @@ namespace Tuna_Swarm_Optimization
                 for(int i=0; i<numb_of_population; i++)
                 {
                     double alpha_1=0, alpha_2 = 0, beta = 0, l = 0, p = 0;
-                    calculate_parameters(ref alpha_1, ref alpha_2, ref beta, ref l, ref p);
+                    calculate_parameters(ref alpha_1, ref alpha_2, ref beta, ref l, ref p, w);
                     double rand = random.NextDouble();
 
-                    if (rand > const_z)
+                    if (rand < const_z)
                     {
                         equation_1(temp_arguments, i);
                     }
@@ -367,7 +372,7 @@ namespace Tuna_Swarm_Optimization
                         equation_9_transformation(rand, p, i);
                     }
 
-                    else if((current_iteration/number_of_iterations) < rand)
+                    else if((double)current_iteration/number_of_iterations < rand)
                     {
                         equation_7_transformation(alpha_1, alpha_2, beta, i);
                     }
