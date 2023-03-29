@@ -31,7 +31,7 @@ namespace Tuna_Swarm_Optimization
         //zmienne pomocnicze
         public int number_of_calls = 0;
         public int current_iteration = 0;
-        string file_name = "Tuna_swarm_optimization.txt";
+        string file_name = "C:\\Users\\nohop\\source\\repos\\Tuna Swarm Optimization\\Tuna Swarm Optimization\\Tuna_swarm_optimization";
 
         public delegate double tested_function(params double[] arg);
         private tested_function f;
@@ -290,33 +290,36 @@ namespace Tuna_Swarm_Optimization
         double IOptimizationAlgorithm.FBest => best_result;
         public void LoadFromFileStateOfAlghoritm()
         {
-            StreamReader sr = new StreamReader(file_name);
-            string line = "";
 
-            if (File.Exists(file_name))
+
+            if (File.Exists(file_name + ".txt"))
             {
+                StreamReader sr = new StreamReader(file_name + ".txt");
+                string line = "";
+
                 line = sr.ReadLine();
-                current_iteration = int.Parse(line);
+                current_iteration = Convert.ToInt32(line);
                 line = sr.ReadLine();
-                number_of_calls = int.Parse(line);
+                number_of_calls = Convert.ToInt32(line);
 
                 for (int i = 0; i < numb_of_population; i++)
                 {
                     line = sr.ReadLine();
                     string[] numbers = line.Split(", ");
-                    results[i] = int.Parse(numbers[0]);
+                    results[i] = Double.Parse(numbers[0]);
 
                     for(int j=0; j< dimension; j++)
                     {
-                        arguments[i][j] = int.Parse(numbers[j+1]);
+                        arguments[i][j] = Double.Parse(numbers[j+1]);
                     }
                 }
+                sr.Close();
             }
-            sr.Close();
+ 
         }
         public void SaveResult()
         {
-            StreamWriter sw = new StreamWriter(file_name + "_END_RESULT");
+            StreamWriter sw = File.CreateText(file_name + "_END_RESULT.txt");
             sw.WriteLine("Ilosc wywolan funkcji: " + number_of_calls);
             sw.WriteLine("Rozmiar populacji: " + numb_of_population);
             sw.WriteLine("Ilosc iteracji: " + number_of_iterations);
@@ -336,7 +339,9 @@ namespace Tuna_Swarm_Optimization
         }
         public void SaveToFileStateOfAlghoritm()
         {
-            StreamWriter sw = new StreamWriter(file_name);
+            
+              StreamWriter  sw = File.CreateText(file_name+".txt");
+
             sw.WriteLine(current_iteration);
             sw.WriteLine(number_of_calls);
 
@@ -356,13 +361,13 @@ namespace Tuna_Swarm_Optimization
             limit_setter();
             //current_iteration = 0;
             Random random = new Random();
-            //LoadFromFileStateOfAlghoritm();
+            LoadFromFileStateOfAlghoritm();
             if (current_iteration == 0) { creating_initial_population();}
             update_best();
-            
+           
 
 
-            for(int w = current_iteration; w < number_of_iterations; w++)
+            for (int w = current_iteration; w < number_of_iterations; w++)
             {
                 displaying_in_console(w);
                 for(int i=0; i<numb_of_population; i++)
@@ -407,7 +412,7 @@ namespace Tuna_Swarm_Optimization
                 results[i] = f(arguments[i]);
                 number_of_calls++;
                }
-
+                current_iteration = w;
                 update_best();
                 SaveToFileStateOfAlghoritm();
             }
