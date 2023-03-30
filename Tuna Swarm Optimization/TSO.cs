@@ -31,7 +31,7 @@ namespace Tuna_Swarm_Optimization
         //zmienne pomocnicze
         public int number_of_calls = 0;
         public int current_iteration = 0;
-        string file_name = "C:\\Users\\nohop\\source\\repos\\Tuna Swarm Optimization\\Tuna Swarm Optimization\\Tuna_swarm_optimization";
+        string file_name = "C:\\tso results\\Tuna_swarm_optimization";
 
         public delegate double tested_function(params double[] arg);
         private tested_function f;
@@ -131,7 +131,7 @@ namespace Tuna_Swarm_Optimization
             double insx3l = 3 * inside_l;
             l = Math.Exp(insx3l);
             double inside_beta = Math.Cos(2 * Math.PI * b);
-            beta = inside_beta* Math.Exp(b * l)/1000000000; //tu to jest tak chwilowo bo inaczej jakeis magiczne argumenty wyskakauja a tak sa chociaz w przedzialexD
+            beta = inside_beta* Math.Exp(b * l)/100000000; //tu to jest tak chwilowo bo inaczej jakeis magiczne argumenty wyskakauja a tak sa chociaz w przedzialexD
 
             p = Math.Pow((1 - arg_for_p), arg_for_p);
             //Console.WriteLine("a1 = " + alpha_1 + " a2 = " + alpha_2 + " beta = " + beta + " l = " + l + " p = " + p + " arg = " + arg_for_p);
