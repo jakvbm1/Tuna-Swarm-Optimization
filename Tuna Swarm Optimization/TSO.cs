@@ -258,9 +258,8 @@ namespace Tuna_Swarm_Optimization
             {
                 temp_arguments[i][j] = new_args[j];
             }
-            //results[i] = f(arguments[i]);
-            //number_of_calls++;
-            //update_best(arguments[i], results[i]);
+            results[i] = f(arguments[i]);
+            number_of_calls++;
         }
 
         void displaying_in_console(int iteration) //funkcja do testowania by "podgladac" wyniki dzialania programu w konsoli
