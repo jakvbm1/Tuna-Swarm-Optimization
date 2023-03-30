@@ -18,14 +18,11 @@ namespace Tuna_Swarm_Optimization
        private double const_a;
        private double[] upper_limit;
        private double[] lower_limit;
-       private double[] probabilities;
-       private double[] index;
 
         //rozwiazania
        private double[][] arguments;
        private double[] results;
        private double[][] temp_arguments;
-       private double[] temp_results;
 
         //najlepsze rozwiazanie
         public double[] best_arguments;
@@ -34,12 +31,12 @@ namespace Tuna_Swarm_Optimization
         //zmienne pomocnicze
         public int number_of_calls = 0;
         public int current_iteration = 0;
-        string file_name = "Tuna_swarm_optimization.txt";
+        string file_name = "C:\\Users\\nohop\\source\\repos\\Tuna Swarm Optimization\\Tuna Swarm Optimization\\Tuna_swarm_optimization";
 
         public delegate double tested_function(params double[] arg);
         private tested_function f;
 
-        public TSO(int number_of_iterations, int numb_of_population, int dimension, tested_function f, double const_z, double const_a,)
+        public TSO(int number_of_iterations, int numb_of_population, int dimension, tested_function f, double const_z=0.05, double const_a=0.7)
         {
             this.number_of_iterations = number_of_iterations;
             this.numb_of_population = numb_of_population;
@@ -51,11 +48,8 @@ namespace Tuna_Swarm_Optimization
             this.arguments = new double[numb_of_population][];
             this.results = new double[numb_of_population];
             this.temp_arguments = new double[numb_of_population][];
-            this.temp_results = new double[numb_of_population];
             best_arguments = new double[dimension];
-            probabilities = new double[numb_of_population];
-            index = new double[numb_of_population];
-            best_result = 0;
+            best_result = 1000000;
             this.f = f;
 
             for(int i=0; i<numb_of_population; i++)
@@ -64,6 +58,52 @@ namespace Tuna_Swarm_Optimization
                 temp_arguments[i] = new double[dimension];
             }
         }
+
+        void limit_setter()
+        {
+            string user_input;
+            double limit_d, limit_u;
+            Console.WriteLine("Czy granice dla wszystkich wymiarow sa identyczne? [t/n]");
+            char ans;
+            ans = Convert.ToChar(Console.ReadLine());
+
+            if (ans == 't' || ans == 'T')
+            {
+                
+                Console.WriteLine("podaj ograniczenie dolne");
+                user_input = Console.ReadLine();
+                limit_d = Double.Parse(user_input);
+
+
+                Console.WriteLine("podaj ograniczenie gorne");
+                user_input = Console.ReadLine();
+                limit_u = Double.Parse(user_input);
+
+                for (int i = 0; i < dimension; i++)
+                {
+                    upper_limit[i] = limit_u;
+                    lower_limit[i] = limit_d;
+                }
+            }
+
+            else
+            {
+                for (int i = 0; i < dimension; i++)
+                {
+                    Console.WriteLine("Wymiar: " + (i + 1));
+                    Console.WriteLine("podaj ograniczenie dolne");
+                    user_input = Console.ReadLine();
+                    limit_d = Double.Parse(user_input);
+
+                    Console.WriteLine("podaj ograniczenie gorne");
+                    user_input = Console.ReadLine();
+                    limit_u = Double.Parse(user_input);
+                    upper_limit[i] = limit_u;
+                    lower_limit[i] = limit_d;
+                }
+            }
+        }
+
         void creating_initial_population()
         {
 
@@ -77,63 +117,34 @@ namespace Tuna_Swarm_Optimization
 
             SaveToFileStateOfAlghoritm();
         }
-        void Sort_population()
-        {
-            for(int i=1; i<numb_of_population; i++)
-            {
-                for (int j=0; j<numb_of_population-i; j++)
-                {
-                    if (results[j] > results[j+1])
-                    {
-                        double result_placeholder;
-                        double[] arguments_placeholder = new double[dimension];
-                        result_placeholder = results[j];
-                        for (int k=0; k<dimension; k++)
-                        {
-                            arguments_placeholder[k] = arguments[j][k];
-                        }
-<<<<<<<<< Temporary merge branch 1
-=========
-
-                        results[j] = results[j+1];
-                        results[j+1] = result_placeholder;
-
-                        for(int k=0; k<dimension; k++)
-                        {
-                            arguments[j][k] = arguments[j + 1][k];
-                            arguments[j + 1][k] = arguments_placeholder[k];
-                        }
-                    }
-                }
-            }
-
-            best_result = results[0];
-            for(int i=0; i<dimension; i++)
-            {
-                best_arguments[i] = arguments[0][i];
-            }
-        }
-        void calculate_parameters(double &alpha_1, double &alpha_2,double &beta, double &l, double &p)
+        void calculate_parameters(ref double alpha_1, ref double alpha_2,ref double beta, ref double l, ref double p, int iteration)
         {
             Random random= new Random();
             double b = random.NextDouble();
-            alpha_1 = const_a + (1 - cons_a) * ((double)current_iteration / number_of_iterations);
-            alpha_2 = (1-const_a) - (1-const_a)*((double)current_iteration / number_of_iterations);
-            l = Math.Exp(3 * Math.Cos((number_of_iterations + (1 / current_iteration)) + 1) * Math.PI);
-            beta = Math.Exp(b * l) * Math.Cos(2 * Math.PI * b);
+            double arg_for_p = (double)iteration / number_of_iterations;
+            alpha_1 = const_a + ((1 - const_a) * arg_for_p);
+            alpha_2 = (1-const_a) - ((1-const_a) * arg_for_p);
 
-            double arg_for_p = current_iteration/ number_of_iterations;
+
+            double ins_ins_l = 1.0 / iteration;
+            double inside_l = Math.Cos(((number_of_iterations + ins_ins_l) - 1) * Math.PI);
+            double insx3l = 3 * inside_l;
+            l = Math.Exp(insx3l);
+            double inside_beta = Math.Cos(2 * Math.PI * b);
+            beta = inside_beta* Math.Exp(b * l)/1000000000; //tu to jest tak chwilowo bo inaczej jakeis magiczne argumenty wyskakauja a tak sa chociaz w przedzialexD
+
             p = Math.Pow((1 - arg_for_p), arg_for_p);
+            //Console.WriteLine("a1 = " + alpha_1 + " a2 = " + alpha_2 + " beta = " + beta + " l = " + l + " p = " + p + " arg = " + arg_for_p);
 
         }
         void update_best()
         {
 
-            best_result = results[0];
-            for (int j = 0; j < dimension; j++)
-            {
-                best_arguments[j] = arguments[0][j];
-            }
+           // best_result = results[0];
+            //for (int j = 0; j < dimension; j++)
+            //{
+            //    best_arguments[j] = arguments[0][j];
+            //}
             for (int i=0; i<numb_of_population; i++)
             {
                 if (results[i]<best_result)
@@ -162,13 +173,17 @@ namespace Tuna_Swarm_Optimization
             double[] new_args = new double[dimension];
             for (int j=0; j<dimension; j++)
             {
+                double diff = Math.Abs(best_arguments[j] - arguments[i][j]);
+                Console.WriteLine("ROZNICA: " + diff);
+                double multiply_by_a = best_arguments[j] + (beta * diff);
+
                 if (i == 0)
                 {
-                    new_args[j] = alpha_1* (best_arguments[j] + beta*Math.Abs(best_arguments[j] - arguments[i][j])) + alpha_2*arguments[i][j];
+                    new_args[j] = (alpha_1* multiply_by_a) + (alpha_2*arguments[i][j]);
                 }
                 else
                 {
-                    new_args[j] = alpha_1 * (best_arguments[j] + beta * Math.Abs(best_arguments[j] - arguments[i][j])) + alpha_2 * arguments[i-1][j];
+                    new_args[j] = (alpha_1 * multiply_by_a) + (alpha_2 * arguments[i-1][j]);
                 }
             }
             
@@ -183,22 +198,25 @@ namespace Tuna_Swarm_Optimization
         void equation_7_transformation(double alpha_1, double alpha_2, double beta, int i)
         {
             double[] random_point = new double[dimension];
-            for(int i=0; i<dimension; i++)
+            Random random = new Random();
+            for (int j=0; j<dimension; j++)
             {
-                Random random = new Random();
-                random_point[i] = random.NextDouble() * (upper_limit[j] - lower_limit[j]) + lower_limit[j];
+                random_point[j] = random.NextDouble() * (upper_limit[j] - lower_limit[j]) + lower_limit[j];
             }
 
             double[] new_args = new double[dimension];
             for (int j = 0; j < dimension; j++)
             {
+                double diff = Math.Abs(random_point[j] - arguments[i][j]);
+                Console.WriteLine("ROZNICA: " + diff);
+                double multiply_by_a = random_point[j] + (beta * diff);
                 if (i == 0)
                 {
-                    new_args[j] = alpha_1 * (random_point[j] + beta * Math.Abs(random_point[j] - arguments[i][j])) + alpha_2 * arguments[i][j];
+                    new_args[j] = (alpha_1 * multiply_by_a) + (alpha_2 * arguments[i][j]);
                 }
                 else
                 {
-                    new_args[j] = alpha_1 * (best_arguments[j] + beta * Math.Abs(random_point[j] - arguments[i][j])) + alpha_2 * arguments[i - 1][j];
+                    new_args[j] = (alpha_1 * multiply_by_a) + (alpha_2 * arguments[i - 1][j]);
                 }
             }
 
@@ -217,210 +235,175 @@ namespace Tuna_Swarm_Optimization
             //if (neg_or_pos == 2) { neg_or_pos = -1;}
 
             //double TF = neg_or_pos * random.NextDouble();
-
-            for(int j=0; j < dimension; j++)
+            double[] new_args = new double[dimension];
+            for (int j = 0; j < dimension; j++)
             {
                 //nie jestem pewny czy TF ma być generowane dla każdego wymiaru czy jedno dla wszystkich więc na razie ustawilem osobno dla kazdego wymiaru
-                int neg_or_pos = random.Next(1, 2);
+                int neg_or_pos = random.Next(1, 3);
                 if (neg_or_pos == 2) { neg_or_pos = -1; }
 
-                double TF = neg_or_pos * random.NextDouble();
-                double[] new_args = new double[dimension];
-
+                int TF = neg_or_pos;
                 if (rand < 0.5)
                 {
-                    new_args[i][j] = best_arguments[j] + rand* (best_arguments[j] - arguments[i][j]) + TF*p*p*(best_arguments[j] - arguments[i][j]);
+                    new_args[j] = best_arguments[j] + rand * (best_arguments[j] - arguments[i][j]) + TF * p * p * (best_arguments[j] - arguments[i][j]);
                 }
 
                 else
                 {
-                    new_args[i][j] = TF * p * p * arguments[i][j];
-                }
->>>>>>>>> Temporary merge branch 2
-
-                        results[j] = results[j+1];
-                        results[j+1] = result_placeholder;
-
-                        for(int k=0; k<dimension; k++)
-                        {
-                            arguments[j][k] = arguments[j + 1][k];
-                            arguments[j + 1][k] = arguments_placeholder[k];
-                        }
-                    }
+                    new_args[j] = TF * p * p * arguments[i][j];
                 }
             }
 
-            best_result = results[0];
-            for(int i=0; i<dimension; i++)
+                for (int j = 0; j < dimension; j++)
             {
-                best_arguments[i] = arguments[0][i];
+                temp_arguments[i][j] = new_args[j];
             }
+            //results[i] = f(arguments[i]);
+            //number_of_calls++;
+            //update_best(arguments[i], results[i]);
         }
-        void calculate_parameters(double &alpha_1, double &alpha_2,double &beta, double &l, double &p)
-        {
-            Random random= new Random();
-            double b = random.NextDouble();
-            alpha_1 = const_a + (1 - cons_a) * ((double)current_iteration / number_of_iterations);
-            alpha_2 = (1-const_a) - (1-const_a)*((double)current_iteration / number_of_iterations);
-            l = Math.Exp(3 * Math.Cos((number_of_iterations + (1 / current_iteration)) + 1) * Math.PI);
-            beta = Math.Exp(b * l) * Math.Cos(2 * Math.PI * b);
 
-            double arg_for_p = current_iteration/ number_of_iterations;
-            p = Math.Pow((1 - arg_for_p), arg_for_p);
-
-        }
-        void update_best(double[] args, double res)
+        void displaying_in_console(int iteration) //funkcja do testowania by "podgladac" wyniki dzialania programu w konsoli
         {
-            if (res < best_result)
+            Console.WriteLine("Number of iteration: " + iteration);
+            Console.WriteLine("Results:");
+            for (int i=0; i<numb_of_population; i++)
             {
-                best_result = res;
-                for(int i=0; i<dimension; i++)
-                {best_arguments[i] = args[i];}
-            }
-        }
-
-        void equation_1(int i)
-        {
-            Random random = new Random();
-            for(int j=0; j<dimension; j++)
-            {
-                arguments[i][j] = random.NextDouble() * (upper_limit[j] - lower_limit[j]) + lower_limit[j];
-            }
-            results[i] = f(arguments[i]);
-            number_of_calls++;
-        }
-
-
-
-        void equation_2_transformation(double alpha_1, double alpha_2, double beta, int i)
-        {
-            double[] new_args = new double[dimension];
-            for (int j=0; j<dimension; j++)
-            {
-                if (i == 0)
+                Console.Write(results[i] + ", ");
+                for (int j=0; j<dimension; j++)
                 {
-                    new_args[j] = alpha_1* (best_arguments[j] + beta*Math.Abs(best_arguments[j] - arguments[i][j])) + alpha_2*arguments[i][j];
+                    Console.Write(arguments[i][j] + " ");
                 }
-                else
-                {
-                    new_args[j] = alpha_1 * (best_arguments[j] + beta * Math.Abs(best_arguments[j] - arguments[i][j])) + alpha_2 * arguments[i-1][j];
-                }
-            }
-            
-            for(int j=0; j<dimension; j++)
-            {
-                arguments[i][j] = new_args[j];
-            }
-            results[i] = f(arguments[i]);
-            number_of_calls++;
-            update_best(arguments[i], results[i]);
-        }
-        void equation_7_transformation(double alpha_1, double alpha_2, double beta, int i)
-        {
-            double[] random_point = new double[dimension];
-            for(int i=0; i<dimension; i++)
-            {
-                Random random = new Random();
-                random_point[i] = random.NextDouble() * (upper_limit[j] - lower_limit[j]) + lower_limit[j];
+                Console.Write('\n');
             }
 
-            double[] new_args = new double[dimension];
+            Console.WriteLine("BEST RESULT: " + best_result);
+            Console.Write("BEST ARGS: ");
             for (int j = 0; j < dimension; j++)
             {
-                if (i == 0)
-                {
-                    new_args[j] = alpha_1 * (random_point[j] + beta * Math.Abs(random_point[j] - arguments[i][j])) + alpha_2 * arguments[i][j];
-                }
-                else
-                {
-                    new_args[j] = alpha_1 * (best_arguments[j] + beta * Math.Abs(random_point[j] - arguments[i][j])) + alpha_2 * arguments[i - 1][j];
-                }
+                Console.Write(best_arguments[j] + " ");
             }
-
-            for (int j = 0; j < dimension; j++)
-            {
-                arguments[i][j] = new_args[j];
-            }
-            results[i] = f(arguments[i]);
-            number_of_calls++;
-            update_best(arguments[i], results[i]);
         }
 
-            }
-            for (int j = 0; j < dimension; j++)
-            {
-                arguments[i][j] = new_args[j];
-            }
-            results[i] = f(arguments[i]);
-            number_of_calls++;
-            update_best(arguments[i], results[i]);
-        }
-
-
-        public int NumberOfEvaluationFitnessFunction => throw new NotImplementedException();
-
-        double[] IOptimizationAlgorithm.XBest => throw new NotImplementedException();
-
-        double IOptimizationAlgorithm.FBest => throw new NotImplementedException();
-
+        public int NumberOfEvaluationFitnessFunction => number_of_calls;
+        double[] IOptimizationAlgorithm.XBest => best_arguments;
+        double IOptimizationAlgorithm.FBest => best_result;
         public void LoadFromFileStateOfAlghoritm()
         {
-            throw new NotImplementedException();
+
+
+            if (File.Exists(file_name + ".txt"))
+            {
+                StreamReader sr = new StreamReader(file_name + ".txt");
+                string line = "";
+
+                line = sr.ReadLine();
+                current_iteration = Convert.ToInt32(line);
+                line = sr.ReadLine();
+                number_of_calls = Convert.ToInt32(line);
+
+                for (int i = 0; i < numb_of_population; i++)
+                {
+                    line = sr.ReadLine();
+                    string[] numbers = line.Split(", ");
+                    results[i] = Double.Parse(numbers[0]);
+
+                    for(int j=0; j< dimension; j++)
+                    {
+                        arguments[i][j] = Double.Parse(numbers[j+1]);
+                    }
+                }
+                sr.Close();
+            }
+ 
         }
         public void SaveResult()
         {
+            StreamWriter sw = File.CreateText(file_name + "_END_RESULT.txt");
+            sw.WriteLine("Ilosc wywolan funkcji: " + number_of_calls);
+            sw.WriteLine("Rozmiar populacji: " + numb_of_population);
+            sw.WriteLine("Ilosc iteracji: " + number_of_iterations);
+            sw.WriteLine("parametr a: " + const_a);
+            sw.WriteLine("parametr z: " + const_z);
+            sw.WriteLine("Ilosc wymiarow funkcji: " + dimension + '\n' );
+
+            sw.Write("Najlepszy wynik: " + best_result + " jego argumenty: ");
+            for(int i=0; i<dimension; i++)
+            {
+                sw.Write(best_arguments[i]+", ");
+                sw.Write('\n');
+            }
+
+
+
         }
         public void SaveToFileStateOfAlghoritm()
         {
-            StreamWriter sw = new StreamWriter(file_name);
+            
+              StreamWriter  sw = File.CreateText(file_name+".txt");
+
             sw.WriteLine(current_iteration);
             sw.WriteLine(number_of_calls);
 
             for (int i = 0; i < numb_of_population; i++)
             {
+                sw.Write(results[i] + ", ");
                 for (int j = 0; j < dimension; j++)
                 {
-                    sw.Write(arguments[i][j]);
+                    sw.Write(arguments[i][j]+", ");
                 }
-                sw.Write(results[i] + '\n');
+                sw.Write('\n');
             }
+            sw.Close();
         }
         public double Solve()
         {
+            limit_setter();
+            //current_iteration = 0;
             Random random = new Random();
             LoadFromFileStateOfAlghoritm();
-            if (current_iteration== 0) { creating_initial_population();}
+            if (current_iteration == 0) { creating_initial_population();}
             update_best();
+           
 
-            for(current_iteration; current_iteration<number_of_iterations; current_iteration++)
+
+            for (int w = current_iteration; w < number_of_iterations; w++)
             {
+                displaying_in_console(w);
                 for(int i=0; i<numb_of_population; i++)
                 {
-                    double alpha_1, alpha_2, beta, l, p;
-                    calculate_parameters(alpha_1, alpha_2, beta, l, p);
+                    double alpha_1=0, alpha_2 = 0, beta = 0, l = 0, p = 0;
+                    calculate_parameters(ref alpha_1, ref alpha_2, ref beta, ref l, ref p, w);
                     double rand = random.NextDouble();
 
-                    if (rand > const_z)
+                    if (rand < const_z)
                     {
+                        
                         equation_1(temp_arguments, i);
                     }
 
                     else if(rand >= 0.5)
                     {
+                        
                         equation_9_transformation(rand, p, i);
                     }
 
-                    else if((current_iteration/number_of_iterations) < rand)
+                    else if(((double)w/number_of_iterations) < rand)
                     {
                         equation_7_transformation(alpha_1, alpha_2, beta, i);
                     }
 
                     else
                     {
-                        equation_2_transformation(alpha_1, alpha_2, beta, i);
+
+                       equation_2_transformation(alpha_1, alpha_2, beta, i);
+
                     }
                 }
-                for (int i = 0; i < numb_of_population;; i++)
+
+
+
+                for (int i = 0; i < numb_of_population; i++)
                { 
                 for (int j = 0; j<dimension; j++)
                 {
@@ -429,13 +412,13 @@ namespace Tuna_Swarm_Optimization
                 results[i] = f(arguments[i]);
                 number_of_calls++;
                }
-
+                current_iteration = w;
                 update_best();
                 SaveToFileStateOfAlghoritm();
-                current_iteration++;
             }
-
-
+            displaying_in_console(number_of_iterations);
+            SaveResult();
+            return best_result;
         }
     }
 }
