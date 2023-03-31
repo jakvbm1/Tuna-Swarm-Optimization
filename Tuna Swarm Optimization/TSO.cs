@@ -248,7 +248,7 @@ namespace Tuna_Swarm_Optimization
 
             if (File.Exists(file_name + helper.ToString() + ".txt"))
             {
-                StreamReader sr = new StreamReader(file_name + ".txt");
+                StreamReader sr = new StreamReader(file_name + helper.ToString() + ".txt");
                 string line = "";
 
                 line = sr.ReadLine();
@@ -322,7 +322,7 @@ namespace Tuna_Swarm_Optimization
 
             for (int w = current_iteration; w < number_of_iterations; w++)
             {
-                displaying_in_console(w);
+                //displaying_in_console(w);
                 for(int i=0; i<numb_of_population; i++)
                 {
                     double alpha_1=0, alpha_2 = 0, beta = 0, l = 0, p = 0;
@@ -369,7 +369,7 @@ namespace Tuna_Swarm_Optimization
                 update_best();
                 SaveToFileStateOfAlghoritm();
             }
-            displaying_in_console(number_of_iterations);
+            //displaying_in_console(number_of_iterations);
             SaveResult();
             return best_result;
         }

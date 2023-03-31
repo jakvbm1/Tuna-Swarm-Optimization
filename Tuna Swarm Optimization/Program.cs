@@ -152,22 +152,41 @@ namespace Tuna_Swarm_Optimization
             int[] iterations = { 5, 10, 20, 50 };
             int[] population = { 10, 15, 20, 50, 100 };
 
-            double[] upper_lim = new double[dimensions[0]];
-            double[] lower_lim = new double[dimensions[0]];
+            int it = 3;
+            int d = 4;
 
-            for(int i=0; i < dimensions[0]; i++)
+            double[] upper_lim = new double[dimensions[d]];
+            double[] lower_lim = new double[dimensions[d]];
+
+            for(int i=0; i < dimensions[d]; i++)
             {
                 upper_lim[i] = 0;
                 lower_lim[i] = 0;
             }
 
-            setting_limits(ref upper_lim, ref lower_lim, dimensions[0])
+            setting_limits(ref upper_lim, ref lower_lim, dimensions[d]);
 
             for (int i=1; i<11; i++)
             {
-                TSO proba_1 = new(iterations[0], population[0], dimensions[0], Rastrigin_function, i);
-                proba_1.limit_setter(upper_lim, lower_lim)
+                TSO proba_0 = new(iterations[it], population[0], dimensions[d], Rastrigin_function, i);
+                proba_0.limit_setter(upper_lim, lower_lim);
+                proba_0.Solve();
+
+                TSO proba_1 = new(iterations[it], population[1], dimensions[d], Rastrigin_function, (i + 10));
+                proba_1.limit_setter(upper_lim, lower_lim);
                 proba_1.Solve();
+
+                TSO proba_2 = new(iterations[it], population[2], dimensions[d], Rastrigin_function, (i+20));
+                proba_2.limit_setter(upper_lim, lower_lim);
+                proba_2.Solve();
+
+                TSO proba_3 = new(iterations[it], population[3], dimensions[d], Rastrigin_function, (i+30));
+                proba_3.limit_setter(upper_lim, lower_lim);
+                proba_3.Solve();
+
+                TSO proba_4 = new(iterations[it], population[4], dimensions[d], Rastrigin_function, (i + 40));
+                proba_4.limit_setter(upper_lim, lower_lim);
+                proba_4.Solve();
             }
         }
 
