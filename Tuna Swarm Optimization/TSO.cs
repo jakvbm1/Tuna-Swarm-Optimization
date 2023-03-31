@@ -174,7 +174,7 @@ namespace Tuna_Swarm_Optimization
             for (int j=0; j<dimension; j++)
             {
                 double diff = Math.Abs(best_arguments[j] - arguments[i][j]);
-                Console.WriteLine("ROZNICA: " + diff);
+                //Console.WriteLine("ROZNICA: " + diff);
                 double multiply_by_a = best_arguments[j] + (beta * diff);
 
                 if (i == 0)
@@ -208,7 +208,7 @@ namespace Tuna_Swarm_Optimization
             for (int j = 0; j < dimension; j++)
             {
                 double diff = Math.Abs(random_point[j] - arguments[i][j]);
-                Console.WriteLine("ROZNICA: " + diff);
+                //Console.WriteLine("ROZNICA: " + diff);
                 double multiply_by_a = random_point[j] + (beta * diff);
                 if (i == 0)
                 {
