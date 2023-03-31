@@ -101,15 +101,74 @@ namespace Tuna_Swarm_Optimization
             }
         }
 
+        public static void setting_limits(ref double[] upper_limit, ref double[] lower_limit, int dimension)
+        {
+            string user_input;
+            double limit_d, limit_u;
+            Console.WriteLine("Czy granice dla wszystkich wymiarow sa identyczne? [t/n]");
+            char ans;
+            ans = Convert.ToChar(Console.ReadLine());
+
+            if (ans == 't' || ans == 'T')
+            {
+
+                Console.WriteLine("podaj ograniczenie dolne");
+                user_input = Console.ReadLine();
+                limit_d = Double.Parse(user_input);
+
+
+                Console.WriteLine("podaj ograniczenie gorne");
+                user_input = Console.ReadLine();
+                limit_u = Double.Parse(user_input);
+
+                for (int i = 0; i < dimension; i++)
+                {
+                    upper_limit[i] = limit_u;
+                    lower_limit[i] = limit_d;
+                }
+            }
+
+            else
+            {
+                for (int i = 0; i < dimension; i++)
+                {
+                    Console.WriteLine("Wymiar: " + (i + 1));
+                    Console.WriteLine("podaj ograniczenie dolne");
+                    user_input = Console.ReadLine();
+                    limit_d = Double.Parse(user_input);
+
+                    Console.WriteLine("podaj ograniczenie gorne");
+                    user_input = Console.ReadLine();
+                    limit_u = Double.Parse(user_input);
+                    upper_limit[i] = limit_u;
+                    lower_limit[i] = limit_d;
+                }
+            }
+        }
+
         private static void Main(string[] args)
         {
             int[] dimensions = { 2, 5, 10, 30, 50 };
             int[] iterations = { 5, 10, 20, 50 };
             int[] population = { 10, 15, 20, 50, 100 };
 
-            TSO proba_1 = new(iterations[1], population[0], dimensions[0], Rastrigin_function);
+            double[] upper_lim = new double[dimensions[0]];
+            double[] lower_lim = new double[dimensions[0]];
 
-            proba_1.Solve();
+            for(int i=0; i < dimensions[0]; i++)
+            {
+                upper_lim[i] = 0;
+                lower_lim[i] = 0;
+            }
+
+            setting_limits(ref upper_lim, ref lower_lim, dimensions[0])
+
+            for (int i=1; i<11; i++)
+            {
+                TSO proba_1 = new(iterations[0], population[0], dimensions[0], Rastrigin_function, i);
+                proba_1.limit_setter(upper_lim, lower_lim)
+                proba_1.Solve();
+            }
         }
 
     }
