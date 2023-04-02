@@ -152,41 +152,50 @@ namespace Tuna_Swarm_Optimization
             int[] iterations = { 5, 10, 20, 50 };
             int[] population = { 10, 15, 20, 50, 100 };
 
-            int it = 3;
-            int d = 4;
+            int j = 0;
 
-            double[] upper_lim = new double[dimensions[d]];
-            double[] lower_lim = new double[dimensions[d]];
-
-            for(int i=0; i < dimensions[d]; i++)
+            for (int d = 0; d < 5; d++)
             {
-                upper_lim[i] = 0;
-                lower_lim[i] = 0;
-            }
 
-            setting_limits(ref upper_lim, ref lower_lim, dimensions[d]);
+                double[] upper_lim = new double[dimensions[d]];
+                double[] lower_lim = new double[dimensions[d]];
 
-            for (int i=1; i<11; i++)
-            {
-                TSO proba_0 = new(iterations[it], population[0], dimensions[d], Rastrigin_function, i);
-                proba_0.limit_setter(upper_lim, lower_lim);
-                proba_0.Solve();
+                for (int i = 0; i < dimensions[d]; i++)
+                {
+                    upper_lim[i] = 0;
+                    lower_lim[i] = 0;
+                }
 
-                TSO proba_1 = new(iterations[it], population[1], dimensions[d], Rastrigin_function, (i + 10));
-                proba_1.limit_setter(upper_lim, lower_lim);
-                proba_1.Solve();
+                setting_limits(ref upper_lim, ref lower_lim, dimensions[d]);
 
-                TSO proba_2 = new(iterations[it], population[2], dimensions[d], Rastrigin_function, (i+20));
-                proba_2.limit_setter(upper_lim, lower_lim);
-                proba_2.Solve();
+                for (int it = 0; it < 4; it++)
+                {
 
-                TSO proba_3 = new(iterations[it], population[3], dimensions[d], Rastrigin_function, (i+30));
-                proba_3.limit_setter(upper_lim, lower_lim);
-                proba_3.Solve();
+                    for (int i = 1; i < 11; i++)
+                    {
+                        TSO proba_0 = new(iterations[it], population[0], dimensions[d], Rastrigin_function, i + j);
+                        proba_0.limit_setter(upper_lim, lower_lim);
+                        proba_0.Solve();
 
-                TSO proba_4 = new(iterations[it], population[4], dimensions[d], Rastrigin_function, (i + 40));
-                proba_4.limit_setter(upper_lim, lower_lim);
-                proba_4.Solve();
+                        TSO proba_1 = new(iterations[it], population[1], dimensions[d], Rastrigin_function, (i + 10 + j));
+                        proba_1.limit_setter(upper_lim, lower_lim);
+                        proba_1.Solve();
+
+                        TSO proba_2 = new(iterations[it], population[2], dimensions[d], Rastrigin_function, (i + 20 + j));
+                        proba_2.limit_setter(upper_lim, lower_lim);
+                        proba_2.Solve();
+
+                        TSO proba_3 = new(iterations[it], population[3], dimensions[d], Rastrigin_function, (i + 30 + j));
+                        proba_3.limit_setter(upper_lim, lower_lim);
+                        proba_3.Solve();
+
+                        TSO proba_4 = new(iterations[it], population[4], dimensions[d], Rastrigin_function, (i + 40 + j));
+                        proba_4.limit_setter(upper_lim, lower_lim);
+                        proba_4.Solve();
+                    }
+                    j = j + 100;
+                }
+                j = j + 10000;
             }
         }
 

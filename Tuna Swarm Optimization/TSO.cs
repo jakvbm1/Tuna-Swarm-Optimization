@@ -274,14 +274,14 @@ namespace Tuna_Swarm_Optimization
         public void SaveResult()
         {
             StreamWriter sw = File.CreateText(file_name + "_"+helper.ToString()+"_END_RESULT.txt");
-            sw.WriteLine("Ilosc wywolan funkcji celu: " + number_of_calls);
-            sw.WriteLine("Rozmiar populacji: " + numb_of_population);
-            sw.WriteLine("Ilosc iteracji: " + number_of_iterations);
-            sw.WriteLine("parametr a: " + const_a);
-            sw.WriteLine("parametr z: " + const_z);
-            sw.WriteLine("Ilosc wymiarow funkcji: " + dimension + '\n' );
+            sw.WriteLine(number_of_calls);
+            sw.WriteLine(numb_of_population);
+            sw.WriteLine(number_of_iterations);
+            sw.WriteLine(const_a);
+            sw.WriteLine(const_z);
+            sw.WriteLine(dimension);
 
-            sw.Write("Najlepszy wynik: " + best_result + " jego argumenty: ");
+            sw.WriteLine(best_result);
             for(int i=0; i<dimension; i++)
             {
                 sw.Write(best_arguments[i]+", ");
