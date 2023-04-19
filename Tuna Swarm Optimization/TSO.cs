@@ -98,10 +98,10 @@ namespace Tuna_Swarm_Optimization
             double insx3l = 3 * inside_l;
             l = Math.Exp(insx3l);
             double inside_beta = Math.Cos(2 * Math.PI * b);
-            beta = inside_beta * Math.Exp((b * l)); //mam wrazenie ze przez ten parametr niektore "tunczyki" zaczynaja przeszukiwac poza zadana dziedzina ale szczerze niezbyt wiem co z tym zrobic
+            beta = inside_beta * Math.Exp((b * l)); 
 
             p = Math.Pow((1 - arg_for_p), arg_for_p);
-            //Console.WriteLine("a1 = " + alpha_1 + " a2 = " + alpha_2 + " beta = " + beta + " l = " + l + " p = " + p + " arg = " + arg_for_p);
+           
 
         }
         void update_best()
@@ -188,14 +188,11 @@ namespace Tuna_Swarm_Optimization
         void equation_9_transformation(double rand, double p, int i)
         {
             Random random = new Random();
-            //int neg_or_pos = random.Next(1, 2);
-            //if (neg_or_pos == 2) { neg_or_pos = -1;}
 
-            //double TF = neg_or_pos * random.NextDouble();
             double[] new_args = new double[dimension];
             for (int j = 0; j < dimension; j++)
             {
-                //nie jestem pewny czy TF ma być generowane dla każdego wymiaru czy jedno dla wszystkich więc na razie ustawilem osobno dla kazdego wymiaru
+                
                 int neg_or_pos = random.Next(1, 3);
                 if (neg_or_pos == 2) { neg_or_pos = -1; }
 
@@ -318,7 +315,7 @@ namespace Tuna_Swarm_Optimization
             if (current_iteration == 0) { creating_initial_population();}
             update_best();
            
-
+            //aby widziec efekty pracy "na biezaco" w konsoli nalezy odkomentowac komendy displaying_in_console
 
             for (int w = current_iteration; w < number_of_iterations; w++)
             {
