@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,21 +32,19 @@ namespace Tuna_Swarm_Optimization
         //zmienne pomocnicze
         public int number_of_calls = 0;
         public int current_iteration = 0;
-        public int helper;
 
-        string file_name = "C:\\tso results\\Tuna_swarm_optimization";
+        string file_name = "Tuna_swarm_optimization.txt";
 
         public delegate double tested_function(params double[] arg);
         private tested_function f;
 
-        public TSO(int number_of_iterations, int numb_of_population, int dimension, tested_function f,int helper, double const_z=0.05, double const_a=0.7)
+        public TSO(int number_of_iterations, int numb_of_population, int dimension, tested_function f, double const_z=0.05, double const_a=0.7)
         {
             this.number_of_iterations = number_of_iterations;
             this.numb_of_population = numb_of_population;
             this.dimension = dimension;
             this.const_z = const_z;
             this.const_a = const_a;
-            this.helper = helper;
             this.upper_limit = new double[dimension];
             this.lower_limit = new double[dimension];
             this.arguments = new double[numb_of_population][];
@@ -243,9 +242,9 @@ namespace Tuna_Swarm_Optimization
         {
 
 
-            if (File.Exists(file_name + helper.ToString() + ".txt"))
+            if (File.Exists(file_name))
             {
-                StreamReader sr = new StreamReader(file_name + helper.ToString() + ".txt");
+                StreamReader sr = new StreamReader(file_name);
                 string line = "";
 
                 line = sr.ReadLine();
@@ -257,12 +256,13 @@ namespace Tuna_Swarm_Optimization
                 {
                     line = sr.ReadLine();
                     string[] numbers = line.Split(", ");
-                    results[i] = Double.Parse(numbers[0]);
+                                      
 
                     for(int j=0; j< dimension; j++)
                     {
-                        arguments[i][j] = Double.Parse(numbers[j+1]);
+                        arguments[i][j] = Convert.ToDouble(numbers[j]);
                     }
+                    results[i] = Convert.ToDouble(numbers[dimension]);
                 }
                 sr.Close();
             }
@@ -270,7 +270,7 @@ namespace Tuna_Swarm_Optimization
         }
         public void SaveResult()
         {
-            StreamWriter sw = File.CreateText(file_name + "_"+helper.ToString()+"_END_RESULT.txt");
+            StreamWriter sw = File.CreateText("TSO_END.txt");
             sw.WriteLine(number_of_calls);
             sw.WriteLine(numb_of_population);
             sw.WriteLine(number_of_iterations);
@@ -291,21 +291,83 @@ namespace Tuna_Swarm_Optimization
         public void SaveToFileStateOfAlghoritm()
         {
             
-              StreamWriter  sw = File.CreateText(file_name+helper.ToString()+".txt");
+              StreamWriter  sw = File.CreateText(file_name);
 
             sw.WriteLine(current_iteration);
             sw.WriteLine(number_of_calls);
 
             for (int i = 0; i < numb_of_population; i++)
             {
-                sw.Write(results[i] + ", ");
+                
                 for (int j = 0; j < dimension; j++)
                 {
                     sw.Write(arguments[i][j]+", ");
                 }
+                sw.Write(results[i]);
                 sw.Write('\n');
             }
             sw.Close();
+            string name = "TSO_iteracja_"+current_iteration.ToString() + ".txt";
+            Console.WriteLine(name);
+            StreamWriter sw2 = File.CreateText(name);
+
+            sw2.WriteLine(const_a);
+            sw2.WriteLine(const_z);
+            sw2.WriteLine(dimension);
+            sw2.WriteLine(number_of_iterations);
+            sw2.WriteLine(numb_of_population);
+            sw2.WriteLine(number_of_calls);
+
+            //sortowanie aktualnych wynikow by w pliku byly zapisane od najlepszego do najgorszego, sortuje na przekopiowanych do tymczasowych zmiennych
+            //zamiast "oryginalow", bo sortowanie na oryginalach wplyneloby na dzialanie argumentu
+            double[] res_to_save = new double[numb_of_population];
+            double[][] args_to_save = new double[numb_of_population][];
+
+            for (int i = 0; i < numb_of_population; i++)
+            {
+                args_to_save[i] = new double[dimension];
+            }
+
+            for (int i=0; i< numb_of_population;i++)
+            {
+                res_to_save[i] = results[i];
+                for (int j=0; j < dimension; j++)
+                {
+                    args_to_save[i][j] = arguments[i][j];
+                }
+            }
+
+            for(int i=0; i<numb_of_population; i++)
+            {
+                for (int j=0; j<numb_of_population-i-1; j++)
+                {
+                    if (res_to_save[j] > res_to_save[j+1])
+                    {
+                        double temp_r = res_to_save[j];
+
+                        res_to_save[j] = res_to_save[j + 1];
+                        res_to_save[j+1] = temp_r;
+
+                        for (int k=0; k<dimension; k++)
+                        {
+                            double temp_a = args_to_save[j][k];
+                            args_to_save[j][k] = args_to_save[j+1][k];
+                            args_to_save[j+1][k] = temp_a;
+                        }
+                    }
+                }
+            }
+
+            for (int i=0; i<numb_of_population; i++)
+            {
+                for (int j=0; j<dimension; j++)
+                {
+                    sw2.Write(args_to_save[i][j]+ ", ");
+                }
+                sw2.Write(res_to_save[i] + '\n');
+            }
+            sw2.Close();
+
         }
         public double Solve()
         {
@@ -349,6 +411,8 @@ namespace Tuna_Swarm_Optimization
                        equation_2_transformation(alpha_1, alpha_2, beta, i);
 
                     }
+
+                    current_iteration = w;
                 }
 
 
