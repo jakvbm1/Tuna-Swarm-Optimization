@@ -308,7 +308,6 @@ namespace Tuna_Swarm_Optimization
             }
             sw.Close();
             string name = "TSO_iteracja_"+current_iteration.ToString() + ".txt";
-            Console.WriteLine(name);
             StreamWriter sw2 = File.CreateText(name);
 
             sw2.WriteLine(const_a);
